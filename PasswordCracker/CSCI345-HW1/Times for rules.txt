@@ -1,0 +1,22 @@
+Rule 1 Function call: 0.29720449447631836 
+Rule 1 No Function call: 0.40392041206359863                                                                            Rule 1 Function call: 0.3829765319824219                                                                                Rule 1 No Function call: 0.4059150218963623                                                                             Rule 2 Using Pool: 2.310819149017334                                                                                    Rule 2 Not using Pool: 10.188753604888916                                                                               Rule 3: 0.06881594657897949 
+Rule 4: 58.47177457809448                                                                                               
+Rule 5: 0.26628708839416504                                                                                             
+Rule 1 Function call: 0.3789858818054199                                                                                Rule 1 No Function call: 0.4059154987335205                                                                             Rule 2 Using Pool: 2.439476251602173                                                                                    Rule 2 Not using Pool: 7.88391637802124 
+Rule 3: 0.06981396675109863                                                                                             
+Rule 1 Function call: 0.29021573066711426                                                                               Rule 1 No Function call: 0.3041870594024658                                                                             Rule 2 Using Pool: 2.942131757736206                                                                                    Rule 2 Not using Pool: 7.991629600524902                                                                                Rule 3: 0.06482720375061035  
+Rule 4: 45.395050048828125  
+Rule 5: 0.20744538307189941  
+Rule 1 Function call: 0.07879018783569336  
+Rule 1 No Function call: 0.3171534538269043                                                                             Rule 1 Function call: 0.27426719665527344                                                                               Rule 1 No Function call: 0.3121645450592041                                                                             Rule 2 Using Pool: 2.4554312229156494                                                                                   Rule 2 Not using Pool: 7.993622303009033                                                                                Rule 3: 0.07978677749633789 
+Rule 4: 45.596593141555786                                                                                              
+Rule 5: 0.19946742057800293                                                                                             
+Rule 1 Function call: 0.2732679843902588                                                                                Rule 1 No Function call: 0.31914520263671875                                                                            Rule 2 Using Pool: 2.4424688816070557 
+Rule 2 Not using Pool: 7.888904333114624 
+Rule 3: 0.06881523132324219                                                                                             
+Rule 1 Function call: 0.27725887298583984                                                                               Rule 1 No Function call: 0.30219197273254395                                                                            Rule 2 Using Pool: 2.608025312423706                                                                                    Rule 2 Not using Pool: 8.01157546043396                                                                                 Rule 3: 0.06383013725280762  
+Rule 4: 44.81515717506409                                                                                               
+Rule 1 Function call: 0.2812466621398926                                                                                Rule 1 No Function call: 0.31116795539855957                                                                            Rule 2 Using Pool: 2.466404438018799 
+Rule 2 Not using Pool: 7.999606609344482                                                                                Rule 3: 0.07280540466308594  
+Rule 4: 49.229764461517334 
+Rule 5: 0.27725911140441895 

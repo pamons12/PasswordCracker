@@ -37,7 +37,7 @@ def rule1(user,wordFile):
     return False
 
 def rule2Helper(user,char,i):
-           cWord = char + ('{:d}'.format(i).zfill(6))
+           cWord = char + ('{:d}'.format(i).zfill(5))
            hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
            if(user.encryption == hashedWord):
                 user.password = cWord
@@ -52,7 +52,7 @@ def rule2(user):
     for char in specialCharsList:
         p = Pool()
         func = partial(rule2Helper,user,char)
-        results=p.map(func,range(999999))
+        results=p.map(func,range(100000))
         p.close()
         p.join()
     return compressLogic(results)
@@ -69,6 +69,7 @@ def rule3(user,wordFile):
                 print("Rule 3")
                 print(user)
                 return True
+    return False
 
 def rule4(user):
     counter=0
@@ -133,11 +134,11 @@ def main():
 
     for userVar in userList:
         passwordGuessed = False
-        wordFile = open("words.txt")
         
         #Rule 1
         startTime=time.time()
-        rule1(userVar,wordFile)
+        wordFile = open("words.txt")
+        passwordGuessed=rule1(userVar,wordFile)
         print("Rule 1 took: {}".format(time.time()-startTime))
 
         #Rule 2
@@ -145,12 +146,12 @@ def main():
             startTime=time.time()
             passwordGuessed=rule2(userVar)
             print("Rule 2 took: {}".format(time.time()-startTime))
-            print(passwordGuessed)
 
         #Rule 3
         if(passwordGuessed == False):
             startTime=time.time()
-            rule3(userVar,wordFile)
+            wordFile = open("words.txt")
+            passwordGuessed=rule3(userVar,wordFile)
             print("Rule 3 took: {}".format(time.time()-startTime))
 
         #Rule 4

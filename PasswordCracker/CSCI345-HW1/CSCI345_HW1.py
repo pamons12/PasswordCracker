@@ -21,26 +21,90 @@ class user:
     def __str__(self):
         return("Username: {}\nEncyrption: {}\nOther stuff: {}\nPassword: {}\n".format(self.username,self.encryption,self.otherStuff,self.password))
 
-def rule1(wordFile,user):
-           for word in wordFile:
-            if (len(word) == 8):
-                word = word[:7].capitalize()
-                for i in range(10):
-                    cWord = word
-                    cWord+=str(i)
-                    hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
-                    if(user.encryption == hashedWord):
-                        user.password = cWord
-                        print("Rule 1")
-                        print(user)
-                        return True
-def rule2(user,char,i):
+def rule1(user,wordFile):
+    for word in wordFile:
+        if (len(word) == 8):
+            word = word[:7].capitalize()
+            for i in range(10):
+                cWord = word
+                cWord+=str(i)
+                hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
+                if(user.encryption == hashedWord):
+                    user.password = cWord
+                    print("Rule 1")
+                    print(user)
+                    return True
+    return False
+
+def rule2Helper(user,char,i):
            cWord = char + ('{:d}'.format(i).zfill(6))
            hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
            if(user.encryption == hashedWord):
                 user.password = cWord
                 print("Rule 2")
                 print(user)
+                return True
+           else:
+                return False
+
+def rule2(user):
+    specialCharsList = ["*","~","!","#"]
+    for char in specialCharsList:
+        p = Pool()
+        func = partial(rule2Helper,user,char)
+        results=p.map(func,range(999999))
+        p.close()
+        p.join()
+    return compressLogic(results)
+
+def rule3(user,wordFile):
+    for word in wordFile:
+        cWord = word[:-1]
+        if (len(cWord) == 5 and (cWord.find("a") >= 0 or cWord.find("l") >= 0)):
+            cWord = cWord.replace("a","@")
+            cWord = cWord.replace("l","1")
+            hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
+            if(user.encryption == hashedWord):
+                user.password = cWord
+                print("Rule 3")
+                print(user)
+                return True
+
+def rule4(user):
+    counter=0
+    p = Pool()
+    func = partial(rule4Helper,user)
+    results=p.map(func,range(9999999))
+    p.close()
+    p.join()
+    for i in range(7):
+                counter=0
+                for j in range(int(math.pow(10,i+1))):
+                    cWord = '{:d}'.format(counter).zfill(i+2)
+                    hashedWord = hashlib.sha256(str(cWord).encode()).hexdigest()
+                    if(user.encryption == hashedWord):
+                        user.password = str(cWord)
+                        print("Rule 4")
+                        print(user)
+                        return True
+                    counter+=1
+    return False
+
+def rule4Helper(user,i):
+    hashedWord = hashlib.sha256(str(i).encode()).hexdigest()
+    if(user.encryption == hashedWord):
+        user.password = str(i)
+        print("Rule 4")
+        print(user)
+        return True
+    else:
+        return False
+
+def compressLogic(list):
+     result=False
+     for thing in list:
+         result=result or thing
+     return result
 
 def main():
     passwordFile = open("passwordFile.txt")
@@ -72,97 +136,49 @@ def main():
         wordFile = open("words.txt")
         
         #Rule 1
-        #Using function call
         startTime=time.time()
-        rule1(wordFile,userVar)
-        print("Rule 1 Function call: {}".format(time.time()-startTime))
-
-        #Not using function call
-        wordFile=open("words.txt")
-        startTime=time.time()
-        for word in wordFile:
-            if (len(word) == 8):
-                word = word[:7].capitalize()
-                for i in range(10):
-                    cWord = word
-                    cWord+=str(i)
-                    hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
-                    if(userVar.encryption == hashedWord):
-                        userVar.password = cWord
-                        print("Rule 1")
-                        print(userVar)
-                        passwordGuessed = True
-        print("Rule 1 No Function call: {}".format(time.time()-startTime))
+        rule1(userVar,wordFile)
+        print("Rule 1 took: {}".format(time.time()-startTime))
 
         #Rule 2
         if(passwordGuessed == False):
-            specialCharsList = ["*","~","!","#"]
-
-            #Using Pool
             startTime=time.time()
-            for char in specialCharsList:
-                p = Pool()
-                func = partial(rule2,userVar,char)
-                p.map(func,range(999999))
-                p.close()
-                p.join()
-            print("Rule 2 Using Pool: {}".format(time.time()-startTime))
-
-            #Not using pool
-            startTime=time.time()
-            for char in specialCharsList:
-                for i in range(999999):
-                    cWord = char + ('{:d}'.format(i).zfill(6))
-                    hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
-                    if(userVar.encryption == hashedWord):
-                        userVar.password = cWord
-                        print("Rule 2")
-                        print(userVar)
-                        passwordGuessed = True
-            print("Rule 2 Not using Pool: {}".format(time.time()-startTime))
+            passwordGuessed=rule2(userVar)
+            print("Rule 2 took: {}".format(time.time()-startTime))
+            print(passwordGuessed)
 
         #Rule 3
         if(passwordGuessed == False):
             startTime=time.time()
-            wordFile = open("words.txt")
-            for word in wordFile:
-                cWord = word[:-1]
-                if (len(cWord) == 5 and (cWord.find("a") >= 0 or cWord.find("l") >= 0)):
-                    cWord = cWord.replace("a","@")
-                    cWord = cWord.replace("l","1")
-                    hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
-                    if(userVar.encryption == hashedWord):
-                        userVar.password = cWord
-                        print("Rule 3")
-                        print(userVar)
-                        passwordGuessed = True
-            print("Rule 3: {}".format(time.time()-startTime))
+            rule3(userVar,wordFile)
+            print("Rule 3 took: {}".format(time.time()-startTime))
 
         #Rule 4
         if(passwordGuessed==False):
             startTime=time.time()
-            counter=0
-            for i in range(9999999):
-                hashedWord = hashlib.sha256(str(i).encode()).hexdigest()
-                if(userVar.encryption == hashedWord):
-                    userVar.password = str(i)
-                    print("Rule 4")
-                    print(userVar)
-                    passwordGuessed = True
+            passwordGuessed=rule4(userVar)
+            #counter=0
+            #for i in range(9999999):
+            #    hashedWord = hashlib.sha256(str(i).encode()).hexdigest()
+            #    if(userVar.encryption == hashedWord):
+            #        userVar.password = str(i)
+            #        print("Rule 4")
+            #        print(userVar)
+            #        passwordGuessed = True
 
-            for i in range(7):
-                counter=0
-                for j in range(int(math.pow(10,i+1))):
-                    cWord = '{:d}'.format(counter).zfill(i+2)
-                    hashedWord = hashlib.sha256(str(cWord).encode()).hexdigest()
-                    if(userVar.encryption == hashedWord):
-                        userVar.password = str(cWord)
-                        print("Rule 4")
-                        print(userVar)
-                        passwordGuessed = True
-                        i=6
-                        break
-                    counter+=1
+            #for i in range(7):
+            #    counter=0
+            #    for j in range(int(math.pow(10,i+1))):
+            #        cWord = '{:d}'.format(counter).zfill(i+2)
+            #        hashedWord = hashlib.sha256(str(cWord).encode()).hexdigest()
+            #        if(userVar.encryption == hashedWord):
+            #            userVar.password = str(cWord)
+            #            print("Rule 4")
+            #            print(userVar)
+            #            passwordGuessed = True
+            #            i=6
+            #            break
+            #        counter+=1
             print("Rule 4: {}".format(time.time()-startTime))
         #Rule 5
         if(passwordGuessed==False):

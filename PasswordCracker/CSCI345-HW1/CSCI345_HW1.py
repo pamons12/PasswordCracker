@@ -24,7 +24,7 @@ class user:
 def rule1(user,wordFile):
     for word in wordFile:
         if (len(word) == 8):
-            word = word[:7].capitalize()
+            word = word[:-1].capitalize()
             for i in range(10):
                 cWord = word
                 cWord+=str(i)
@@ -55,7 +55,7 @@ def rule2(user):
         results=p.map(func,range(100000))
         p.close()
         p.join()
-    return compressLogic(results)
+    return compressLogicList(results)
 
 def rule3(user,wordFile):
     for word in wordFile:
@@ -72,25 +72,35 @@ def rule3(user,wordFile):
     return False
 
 def rule4(user):
-    counter=0
     p = Pool()
     func = partial(rule4Helper,user)
     results=p.map(func,range(9999999))
     p.close()
     p.join()
-    for i in range(7):
-                counter=0
-                for j in range(int(math.pow(10,i+1))):
-                    cWord = '{:d}'.format(counter).zfill(i+2)
-                    hashedWord = hashlib.sha256(str(cWord).encode()).hexdigest()
-                    if(user.encryption == hashedWord):
-                        user.password = str(cWord)
-                        print("Rule 4")
-                        print(user)
-                        return True
-                    counter+=1
-    return False
 
+    result=compressLogicList(results)
+    if result:
+        return result
+
+    for i in range(7):
+        p = Pool()
+        func = partial(rule4Helper2,user,i)
+        results=p.map(func,range(int(math.pow(10,i+1))))
+        p.close()
+        p.join() 
+        
+    return compressLogicList(results)
+        
+
+def rule4Helper2(user,i,j):
+    cWord = '{:d}'.format(j).zfill(i+2)
+    hashedWord = hashlib.sha256(str(cWord).encode()).hexdigest()
+    if(user.encryption == hashedWord):
+        user.password = str(cWord)
+        print("Rule 4")
+        print(user)
+        return True
+    return False
 def rule4Helper(user,i):
     hashedWord = hashlib.sha256(str(i).encode()).hexdigest()
     if(user.encryption == hashedWord):
@@ -98,13 +108,12 @@ def rule4Helper(user,i):
         print("Rule 4")
         print(user)
         return True
-    else:
-        return False
+    return False
 
-def compressLogic(list):
+def compressLogicList(list):
      result=False
-     for thing in list:
-         result=result or thing
+     for i in range(len(list)):
+         result=result or list[i]
      return result
 
 def main():
@@ -158,29 +167,8 @@ def main():
         if(passwordGuessed==False):
             startTime=time.time()
             passwordGuessed=rule4(userVar)
-            #counter=0
-            #for i in range(9999999):
-            #    hashedWord = hashlib.sha256(str(i).encode()).hexdigest()
-            #    if(userVar.encryption == hashedWord):
-            #        userVar.password = str(i)
-            #        print("Rule 4")
-            #        print(userVar)
-            #        passwordGuessed = True
+            print("Rule 4 took: {}".format(time.time()-startTime))
 
-            #for i in range(7):
-            #    counter=0
-            #    for j in range(int(math.pow(10,i+1))):
-            #        cWord = '{:d}'.format(counter).zfill(i+2)
-            #        hashedWord = hashlib.sha256(str(cWord).encode()).hexdigest()
-            #        if(userVar.encryption == hashedWord):
-            #            userVar.password = str(cWord)
-            #            print("Rule 4")
-            #            print(userVar)
-            #            passwordGuessed = True
-            #            i=6
-            #            break
-            #        counter+=1
-            print("Rule 4: {}".format(time.time()-startTime))
         #Rule 5
         if(passwordGuessed==False):
             startTime=time.time()

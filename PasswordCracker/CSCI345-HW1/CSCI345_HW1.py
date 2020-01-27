@@ -36,17 +36,6 @@ def rule1(user,wordFile):
                     return True
     return False
 
-def rule2Helper(user,char,i):
-           cWord = char + ('{:d}'.format(i).zfill(5))
-           hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
-           if(user.encryption == hashedWord):
-                user.password = cWord
-                print("Rule 2")
-                print(user)
-                return True
-           else:
-                return False
-
 def rule2(user):
     specialCharsList = ["*","~","!","#"]
     for char in specialCharsList:
@@ -55,7 +44,21 @@ def rule2(user):
         results=p.map(func,range(100000))
         p.close()
         p.join()
-    return compressLogicList(results)
+        if(compressLogicList(results)):
+            return True
+
+    return False
+
+def rule2Helper(user,char,i):
+    cWord = char + ('{:d}'.format(i).zfill(5))
+    hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
+    if(user.encryption == hashedWord):
+        user.password = cWord
+        print("Rule 2")
+        print(user)
+        return True
+    else:
+        return False
 
 def rule3(user,wordFile):
     for word in wordFile:
@@ -88,9 +91,19 @@ def rule4(user):
         results=p.map(func,range(int(math.pow(10,i+1))))
         p.close()
         p.join() 
-        
-    return compressLogicList(results)
-        
+        if(compressLogicList(results)):
+            return True
+
+    return False
+   
+def rule4Helper(user,i):
+    hashedWord = hashlib.sha256(str(i).encode()).hexdigest()
+    if(user.encryption == hashedWord):
+        user.password = str(i)
+        print("Rule 4")
+        print(user)
+        return True
+    return False
 
 def rule4Helper2(user,i,j):
     cWord = '{:d}'.format(j).zfill(i+2)
@@ -101,20 +114,24 @@ def rule4Helper2(user,i,j):
         print(user)
         return True
     return False
-def rule4Helper(user,i):
-    hashedWord = hashlib.sha256(str(i).encode()).hexdigest()
-    if(user.encryption == hashedWord):
-        user.password = str(i)
-        print("Rule 4")
-        print(user)
-        return True
+
+def rule5(user,wordFile):
+    wordFile = open("words.txt")
+    for word in wordFile:
+        cWord = word[:-1]
+        hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
+        if(user.encryption == hashedWord):
+            user.password = cWord
+            print("Rule 5")
+            print(user)
+            return True
     return False
 
 def compressLogicList(list):
-     result=False
-     for i in range(len(list)):
-         result=result or list[i]
-     return result
+    count=list.count(True)
+    if(count>0):
+        return True
+    return False
 
 def main():
     passwordFile = open("passwordFile.txt")
@@ -172,15 +189,8 @@ def main():
         #Rule 5
         if(passwordGuessed==False):
             startTime=time.time()
-            wordFile = open("words.txt")
-            for word in wordFile:
-                cWord = word[:-1]
-                hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
-                if(userVar.encryption == hashedWord):
-                    userVar.password = cWord
-                    print("Rule 5")
-                    print(userVar)
-                    passwordGuessed = True
+            wordFile=open("words.txt")
+            passwordGuessed=rule5(userVar,wordFile)
             print("Rule 5: {}".format(time.time()-startTime))
 
     print("Done")                

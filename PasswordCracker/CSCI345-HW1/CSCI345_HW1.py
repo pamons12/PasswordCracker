@@ -55,7 +55,7 @@ def rule2(user):
         p = Pool()
         func = partial(rule2Helper,user,char) 
         #p.map returns a list of booleans in this case
-        results=p.map(func,range(100000))
+        results=p.map(func,range(10000))
         p.close()
         p.join()
         #Checks to see if the users password has been cracked
@@ -70,7 +70,7 @@ def rule2(user):
 def rule2Helper(user,char,i):
     #Adds the character to begining of number with 5 decimal places
     #Adds zeros if i<10000, ex: 00042 i=42 and added 3 zeros to make it 5 decimal places
-    cWord = char + ('{:d}'.format(i).zfill(5))
+    cWord = char + ('{:d}'.format(i).zfill(4))
 
     #Hashes cWord and compares it to users hash
     hashedWord = hashlib.sha256(cWord.encode()).hexdigest()
